@@ -1,0 +1,87 @@
+---
+title: "Capstone Week 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Library
+```{r, warning=FALSE}
+library(readr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(stringr)
+library(ggpubr)
+```
+
+# Read Data
+```{r, message=FALSE}
+en_US_twitter<-read_lines ("C:/Users/slc404/OneDrive - Sherwin-Williams/Rprojects/Coursera/Data Science Capstone/final/en_US/en_US.twitter.txt")
+en_US_news<-read_lines ("C:/Users/slc404/OneDrive - Sherwin-Williams/Rprojects/Coursera/Data Science Capstone/final/en_US/en_US.news.txt")
+en_US_blogs<-read_lines ("C:/Users/slc404/OneDrive - Sherwin-Williams/Rprojects/Coursera/Data Science Capstone/final/en_US/en_US.blogs.txt")
+```
+
+# Basic Summary 
+A basic summary of word count, line count, and character count was conducted. Twitter file has more lines than blog or news. While news has the highest average word count. Blog has the highest avereage character count. 
+```{r, message=FALSE}
+#Word Count
+blog_word_count<-as.data.frame(str_count(en_US_blogs, boundary("word")))
+twitter_word_count<-as.data.frame(str_count(en_US_twitter, boundary("word")))
+news_word_count<-as.data.frame(str_count(en_US_news, boundary("word")))
+
+  colnames(blog_word_count) <- c('blog_avg_word_count') #rename column
+  colnames(twitter_word_count) <- c('twitter_avg_word_count') #rename column
+  colnames(news_word_count) <- c('news_avg_word_count') #rename column
+
+#Character Count
+blog_character_count<-as.data.frame(nchar(en_US_blogs))
+twitter_character_count<-as.data.frame(nchar(en_US_twitter))
+news_character_count<-as.data.frame(nchar(en_US_news))
+
+  colnames(blog_character_count) <- c('blog_avg_character_count') #rename column
+  colnames(twitter_character_count) <- c('twitter_avg_character_count') #rename column
+  colnames(news_character_count) <- c('news_avg_character_count') #rename column
+
+#Create Summary Tables
+blog_summary<-cbind(blog_character_count, blog_word_count)
+twitter_summary<-cbind(twitter_character_count, twitter_word_count)
+news_summary<-cbind(news_character_count, news_word_count)
+
+blog_mean<-summarise_all(blog_summary, mean)
+twitter_mean<-summarise_all(twitter_summary, mean)
+news_mean<-summarise_all(news_summary, mean)
+
+final_summary<-cbind(blog_mean, twitter_mean, news_mean)
+final_summary
+
+#Line count
+blog_length<-length(en_US_blogs)
+blog_twitter<-length(en_US_twitter)
+blog_news<-length(en_US_news)
+
+line_summary<-cbind(blog_length, blog_twitter, blog_news)
+line_summary
+```
+
+# Exploratory Data Analysis 
+A histogram for character count shows that blog and news are highly skewed, while twitter isn't as skewed, but does have an interesting shape that is non-normal. 
+```{r}
+p1<-ggplot(blog_summary, aes(x=blog_avg_character_count)) + 
+  geom_histogram()+
+  geom_histogram(binwidth=1)+
+  ggtitle("twitter_character_count")
+p2<-ggplot(twitter_summary, aes(x=twitter_avg_character_count)) + 
+  geom_histogram(binwidth=1)+
+  ggtitle("twitter_character_count")
+p3<-ggplot(news_summary, aes(x=news_avg_character_count)) + 
+  geom_histogram(binwidth=1)+
+  ggtitle("twitter_character_count")
+p1
+p2
+p3
+```
+
